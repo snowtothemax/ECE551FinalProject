@@ -9,7 +9,7 @@ module inert_intf_tb();
 	logic SS_n, SCLK, MOSI, MISO;		// SPI Signals
 	
 	// Instantiate DUTs //
-	inert_inf   iDUT(.clk(clk), .rst_n(rst_n), .strt_cal(strt_cal), .INT(INT), .cal_done(cal_done), .vld(vld), 
+	inert_intf   iDUT(.clk(clk), .rst_n(rst_n), .strt_cal(strt_cal), .INT(INT), .cal_done(cal_done), .vld(vld), 
 				     .ptch(ptch), .roll(roll), .yaw(yaw), .SS_n(SS_n), .SCLK(SCLK), .MOSI(MOSI), .MISO(MISO));
 	SPI_iNEMO2 iNEMO(.SS_n(SS_n), .SCLK(SCLK), .MISO(MISO), .MOSI(MOSI), .INT(INT));
 	
