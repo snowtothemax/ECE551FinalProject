@@ -1,14 +1,14 @@
 module inert_intf(clk, rst_n, strt_cal, INT, cal_done, vld, ptch, roll, yaw, SS_n, SCLK, MOSI, MISO)
 	
-	input clk, rst_n, strt_cal;		// 50 MHz clock, active low reset, and a signal that is high when calibration should begin
-	input INT; 						// INT pin from inertial sensor. High when a new measurement is ready
+	input clk, rst_n, strt_cal;				// 50 MHz clock, active low reset, and a signal that is high when calibration should begin
+	input INT; 								// INT pin from inertial sensor. High when a new measurement is ready
 	input MISO;
-	output cal_done;				// high when calibration completed
-	output reg vld;						// Asserted from SM when output is valid
+	output cal_done;						// high when calibration completed
+	output reg vld;							// Asserted from SM when output is valid
 	output signed [15:0] ptch, roll, yaw;	// Fusion corrected pitch, roll, and yaw
-	output SS_n, SCLK, MOSI;	// SPI interface to inertial sensor
+	output SS_n, SCLK, MOSI;				// SPI interface to inertial sensor
 	
-	parameter FAST_SIM = 1;		// used to accelerate simulation
+	parameter FAST_SIM = 1;					// used to accelerate simulation
 	
 	
 	// Instantiate the SPI and Inertial integrator //
@@ -18,12 +18,12 @@ module inert_intf(clk, rst_n, strt_cal, INT, cal_done, vld, ptch, roll, yaw, SS_
 							 .ay(ay), .ptch(ptch), .roll(roll), .yaw(yaw));
 	
 	// Declare Internal Signals //
-	logic wrt, done; 		// Write and done signals for the SPI
-	logic waiting; 			// High when in the INIT1 state, where we have to wait for a 16-bit timer before moving on
-	logic INT_ff1, INT_ff2; // Single and double flopped versions of INT
-	logic [15:0] cmd, inert_data;	// The data to write and data to read (only 7:0 are valid for inert_data)
-	logic signed [15:0] ptch_rt, roll_rt, yaw_rt, ax, ay; // All 16-bit registers used by the inertial integrator
-	logic [15:0] timer; 	// 16-bit timer
+	logic wrt, done; 										// Write and done signals for the SPI
+	logic waiting; 											// High when in the INIT1 state, where we have to wait for a 16-bit timer before moving on
+	logic INT_ff1, INT_ff2; 								// Single and double flopped versions of INT
+	logic [15:0] cmd, inert_data;							// The data to write and data to read (only 7:0 are valid for inert_data)
+	logic signed [15:0] ptch_rt, roll_rt, yaw_rt, ax, ay; 	// All 16-bit registers used by the inertial integrator
+	logic [15:0] timer; 									// 16-bit timer
 	
 	// State Capture Signals //
 	logic C_PH, C_PL, C_RH, C_RL, C_YH, C_YL, C_AXH, C_AXL, C_AYH, C_AYL;	// Capture <signal name> high/low
