@@ -26,8 +26,8 @@ module inert_intf_tb();
 		fork 
 			begin: timeout1
 				repeat(1000000) @(posedge clk);
-				$display("timed out (INT)!")
-				$stop
+				$display("timed out (INT)!");
+				$stop;
 			end
 			begin
 				@(posedge INT);
@@ -48,8 +48,8 @@ module inert_intf_tb();
 		fork 
 			begin: timeout2
 				repeat(1000000) @(posedge clk);
-				$display("timed out (cal_done)!")
-				$stop
+				$display("timed out (cal_done)!");
+				$stop;
 			end
 			begin
 				@(posedge cal_done);
@@ -67,7 +67,7 @@ module inert_intf_tb();
 	
 	
 	// Controls the clock //
-	always_ff
+	always
 		#10 clk = ~clk;
 	
 endmodule
