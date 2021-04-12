@@ -17,9 +17,22 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	// Declare internal signals //
 	parameter FAST_SIM = 1;
 	logic [25:0] timer;
+	// local params for command encodings
+	localparam SET_PITCH = 8'h02;
+	localparam SET_ROLL = 8'h03;
+	localparam SET_YAW = 8'h04;
+	localparam SET_THRST = 8'h05;
+	localparam CALIBRATE = 8'h06;
+	localparam EMER_LAND = 8'h07;
+	localparam MTRS_OFF = 8'h08;
+	
+	// Declare internal signals //
+	// signals declared for control from the SM
+	logic wptch, wroll, wyaw, wthrst, mtrs_off, emergency, strt_cal;
+	logic  [7:0] resp_ack;
 	
 	// Declare SM signals //
-	typedef enum reg [2:0] {IDLE, } state_t;
+	typedef enum reg [2:0] {IDLE, CMD, CAL_WAIT, SEND} state_t;
 	state_t state, nxt_state;
 	
 	// d_ptch register //
@@ -66,7 +79,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	always_ff @(posedge clk, negedge rst_n) begin						// This works, but it's ugly and probably not how we are meant to do it
 		if (~rst_n)
 			timer <= 26'h0;
-		else if (tmr_full)
+		else if (clr_tmr)
 			timer <= 26'h0;
 		else
 			timer <= timer + 1'b1;
@@ -84,6 +97,82 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	end
 	
 	// SM //
+	always_comb begin
+		wptch = 0;
+		wroll = 0;
+		wyaw = 0;
+		wthrst = 0;
+		mtrs_off = 0;
+		clr_tmr = 0;
+		emergency = 0;
+		strt_cal = 0;
+		resp_ack = 8'hA5;
+		send_resp = 0;
+		nxt_state = state;
+		case(state)
+			// wait for cmd ready in idle
+			IDLE: begin
+				if (cmd_rdy) begin
+					nxt_state = CMD;
+				end
+			end
+			//  switch through the opcodes of the command
+			CMD: begin
+				case(cmd)
+					// basic states
+					SET_PITCH: begin
+						wptch = 1;
+						nxt_state = SEND;
+					end
+					SET_ROLL: begin
+						wroll = 1;
+						nxt_state = SEND;
+					end
+					SET_YAW: begin
+						wyaw = 1;
+						nxt_state = SEND;
+					end
+					SET_THRST: begin
+						wthrst = 1;
+						nxt_state = SEND;
+					end
+					EMER_LAND: begin
+						emergency = 1;
+						nxt_state = SEND;
+					end
+					// assign motrs off
+					MTRS_OFF: begin
+						mtrs_off = 1;
+						nxt_state = SEND;
+					end
+					// calibrate
+					default: begin
+						inertial_cal = 1;
+						clr_tmr = 1;
+						nxt_state = CAL_WAIT;
+					end
+				endcase
+			end
+			// wait for tmr full at first
+			// Then wait for cal done
+			CAL_WAIT: begin
+				if(tmr_full) begin
+					strt_cal = 1;
+				end
+				if(cal_done) begin
+					nxt_state = SEND;
+				end
+			end
+			// send the ack
+			default: begin
+				send_resp;
+				nxt_state = IDLE;
+			end
+		endcase
+	end
+	
+	// assign the resp to ack
+	assign resp = resp_ack;
 	
 	
 	// SM Controller //
