@@ -1,5 +1,5 @@
 work/
-incremental_tb/
+incremental_db/
 db/
 
 *.mpf
