@@ -79,7 +79,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	always_ff @(posedge clk, negedge rst_n) begin						// This works, but it's ugly and probably not how we are meant to do it
 		if (~rst_n)
 			timer <= 26'h0;
-		else if (tmr_full)
+		else if (clr_tmr)
 			timer <= 26'h0;
 		else
 			timer <= timer + 1'b1;
@@ -107,6 +107,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 		emergency = 0;
 		strt_cal = 0;
 		resp_ack = 8'hA5;
+		send_resp = 0;
 		nxt_state = state;
 		case(state)
 			// wait for cmd ready in idle
@@ -118,6 +119,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 			//  switch through the opcodes of the command
 			CMD: begin
 				case(cmd)
+					// basic states
 					SET_PITCH: begin
 						wptch = 1;
 						nxt_state = SEND;
@@ -138,17 +140,21 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 						emergency = 1;
 						nxt_state = SEND;
 					end
+					// assign motrs off
 					MTRS_OFF: begin
 						mtrs_off = 1;
 						nxt_state = SEND;
 					end
-					CALIBRATE: begin
+					// calibrate
+					default: begin
 						inertial_cal = 1;
 						clr_tmr = 1;
 						nxt_state = CAL_WAIT;
 					end
 				endcase
 			end
+			// wait for tmr full at first
+			// Then wait for cal done
 			CAL_WAIT: begin
 				if(tmr_full) begin
 					strt_cal = 1;
@@ -157,6 +163,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 					nxt_state = SEND;
 				end
 			end
+			// send the ack
 			default: begin
 				send_resp;
 				nxt_state = IDLE;
