@@ -76,16 +76,8 @@ module inert_intf_test(clk, RST_n, NEXT, LED, SS_n, MOSI, MISO, SCLK, INT);
 		endcase
 	end
 	
-	// MUX that controls the LEDs //
-	always_comb begin					// QUESTION: Does this synthesize how I'd expect it to? (4:1 mux)
-		unique if (sel === 2'b00)
-			LED = {7'b0, stat};
-		else if (sel === ptch_sel)
-			LED = ptch[8:1];
-		else if (sel === roll_sel)
-			LED = roll[8:1];
-		else
-			LED = yaw[8:1];
-	end
+	// 4:1 MUX that controls the LEDs //
+	assign LED = sel[1] ? (sel[0] ? yaw[8:1] : roll[8:1]) : (sel[0] ? ptch[8:1] : {7'b0, stat});
+	
 	
 endmodule
