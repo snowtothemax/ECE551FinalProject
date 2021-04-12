@@ -43,6 +43,11 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	
 	
 	// SM Controller //
-	
+	always_ff begin
+		if (~rst_n)
+			state <= IDLE;
+		else
+			state <= nxt_state;
+	end
 	
 endmodule
