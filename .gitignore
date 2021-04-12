@@ -1,5 +1,16 @@
 work/
+incremental_tb/
+db/
 
 *.mpf
 *.wlf
 *.mti
+*.summary
+*.sof
+*.RPT
+*.qws
+*.qdf
+*.pin
+*.jdi
+*.done
+transcript
