@@ -28,6 +28,8 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 			d_ptch <= 16'h0;
 		else if (wptch)
 			d_ptch <= data;
+		else if (emergency)
+			d_ptch <= 16'h0;
 	end
 	
 	// d_roll register //
@@ -36,6 +38,8 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 			d_roll <= 16'h0;
 		else if (wroll)
 			d_roll <= data;
+		else if (emergency)
+			d_roll <= 16'h0;
 	end
 	
 	// d_yaw register //
@@ -44,6 +48,8 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 			d_yaw <= 16'h0;
 		else if (wyaw)
 			d_yaw <= data;
+		else if (emergency)
+			d_yaw <= 16'h0;
 	end
 	
 	// thrst register //
@@ -52,17 +58,22 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 			thrst <= 16'h0;
 		else if (wthrst)
 			thrst <= data;
+		else if (emergency)
+			thrst <= 16'h0;
 	end
 	
-	// Variable Width Timer //
-	always_ff @(posedge clk, negedge rst_n) begin
+	// Variable Width Timer & timer logic //
+	always_ff @(posedge clk, negedge rst_n) begin						// This works, but it's ugly and probably not how we are meant to do it
 		if (~rst_n)
+			timer <= 26'h0;
+		else if (tmr_full)
 			timer <= 26'h0;
 		else
 			timer <= timer + 1'b1;
 	end
+	assign tmr_full = FAST_SIM ? (&(timer[8:0])) : (&(timer));
 	
-	// Output flop & logic //
+	// Output flop //
 	always_ff @(posedge clk, negedge rst_n) begin
 		if (~rst_n)
 			motors_off <= 1'b1;
