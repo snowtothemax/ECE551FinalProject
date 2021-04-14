@@ -1,11 +1,23 @@
 module cmd_cfg_tb();
 
     /**
+        Setting the commands.
+    **/
+
+    localparam SET_PTCH = 8'h02
+    localparam SET_ROLL = 8'h03
+    localparam SET_YAW = 8'h04
+    localparam SET_THRST = 8'h05
+    localparam SET_CAL = 8'h06
+    localparam SET_EMGL = 8'h07
+    localparam SET_MOFF = 8'h08
+
+    /**
         Setting up the variables for input and output of the duts.
     **/
 
     //Shared by all.
-    logic clk, rst_n;
+    logic clk, rst_n
 
     //Between RemoteComm and UART_comm.
     logic [15:0] data;
@@ -17,6 +29,11 @@ module cmd_cfg_tb();
     logic [8:0] thrst;
     logic [7:0] cmd_1, resp_1;
     logic cmd_rdy, clr_cmd_rdy, snd_rsp, rsp_sent, strt_cal, inertial_cal, cal_done, motors_off;
+
+    //Variables used for testing.
+    logic [7:0] cmd2snd;
+    logic [15:0] data2snd;
+    logic result;
 
     /**
         Setting up the iDuts needed for the testbench.
@@ -39,9 +56,109 @@ module cmd_cfg_tb();
                 .inertial_cal(inertial_cal), .cal_done(cal_done), .motors_off(motors_off));
 
     /**
-        Setting up the tasks needed for the testbench.
+        Calling the tasks needed for the testbench.
     **/
 
+    initial begin
+        /**
+            Calling the tasks
+        **/
+
+        //SET_PTCH Testing.
+        $display("Testing SET_PTCH");
+        cmd2snd = SET_PTCH;
+        data2snd = 16'h001;
+        chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
+        if (result == 0) begin
+            $display("SET_PTCH Test Failed!");
+            $stop;
+        end
+        else begin
+            $display("SET_PTCH Test Passed! YAHOO!!");
+        end
+
+        //SET_ROLL Testing.
+        $display("Testing SET_ROLL");
+        cmd2snd = SET_ROLL;
+        data2snd = 16'h001;
+        chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
+        if (result == 0) begin
+            $display("SET_ROLL Test Failed!");
+            $stop;
+        end
+        else begin
+            $display("SET_ROLL Test Passed! YAHOO!!");
+        end
+
+        //SET_YAW Testing.
+        $display("Testing SET_YAW");
+        cmd2snd = SET_YAW;
+        data2snd = 16'h001;
+        chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
+        if (result == 0) begin
+            $display("SET_YAW Test Failed!");
+            $stop;
+        end
+        else begin
+            $display("SET_YAW Test Passed! YAHOO!!");
+        end
+
+        //SET_THRST Testing.
+        $display("Testing SET_THRST");
+        cmd2snd = SET_THRST;
+        data2snd = 16'h001;
+        chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
+        if (result == 0) begin
+            $display("SET_THRST Test Failed!");
+            $stop;
+        end
+        else begin
+            $display("SET_THRST Test Passed! YAHOO!!");
+        end
+
+        //SET_CAL Testing.
+        $display("Testing SET_CAL");
+        cmd2snd = SET_CAL;
+        data2snd = 16'hxxxx;
+        chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
+        if (result == 0) begin
+            $display("SET_CAL Test Failed!");
+            $stop;
+        end
+        else begin
+            $display("SET_CAL Test Passed! YAHOO!!");
+        end
+
+        //SET_EMGL Testing.
+        $display("Testing SET_EMGL");
+        cmd2snd = SET_EMGL;
+        data2snd = 16'h0000;
+        chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
+        if (result == 0) begin
+            $display("SET_EMGL Test Failed!");
+            $stop;
+        end
+        else begin
+            $display("SET_EMGL Test Passed! YAHOO!!");
+        end
+
+        //SET_EMGL Testing.
+        $display("Testing SET_EMGL");
+        cmd2snd = SET_MOFF;
+        data2snd = 16'hxxxx;
+        chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
+        if (result == 0) begin
+            $display("SET_MOFF Test Failed!");
+            $stop;
+        end
+        else begin
+            $display("SET_MOFF Test Passed! YAHOO!!");
+        end
+
+        $display("All Tests Passed! YAHOO!!!!");
+        $stop;
+
+    end
 
     /**
         Setting up the clk for the testbench.
