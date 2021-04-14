@@ -7,12 +7,12 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	input cal_done;								// Indicates when calibration is done
 	output clr_cmd_rdy;							// Asserted to knock down cmd_rdy after we finish the command
 	output [7:0] resp;							// The response back to the remote. Typically 0xA5
-	output send_resp;							// Asserted when a response should be sent
-	output signed [15:0] d_ptch, d_roll, d_yaw;	// Desired pitch, roll, and yaw SIGNED numbers
-	output [8:0] thrst;							// UNSIGNED thrust level
+	output reg send_resp;							// Asserted when a response should be sent
+	output reg signed [15:0] d_ptch, d_roll, d_yaw;	// Desired pitch, roll, and yaw SIGNED numbers
+	output reg [8:0] thrst;							// UNSIGNED thrust level
 	output strt_cal;							// Indicates when inertial_integrator should calibrate. 1 clock pulse after 1.34 seconds motor spinup period
-	output inertial_cal;						// High during calibration (even motor spinup). Keeps motor at cal speed
-	output motors_off;							// Shuts off motors
+	output reg inertial_cal;						// High during calibration (even motor spinup). Keeps motor at cal speed
+	output reg motors_off;							// Shuts off motors
 	
 	// Declare internal signals //
 	parameter FAST_SIM = 1;
@@ -166,7 +166,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 			end
 			// send the ack
 			default: begin
-				send_resp;
+				send_resp = 1'b1;
 				nxt_state = IDLE;
 			end
 		endcase
@@ -177,7 +177,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	
 	
 	// SM Controller //
-	always_ff begin
+	always_ff @(posedge clk, negedge rst_n) begin
 		if (~rst_n)
 			state <= IDLE;
 		else
