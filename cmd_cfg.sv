@@ -17,6 +17,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	// Declare internal signals //
 	parameter FAST_SIM = 1;
 	logic [((8*FAST_SIM)+(25*!FAST_SIM)) : 0] timer;
+	logic clr_tmr;
 	// local params for command encodings
 	localparam SET_PITCH = 8'h02;
 	localparam SET_ROLL = 8'h03;

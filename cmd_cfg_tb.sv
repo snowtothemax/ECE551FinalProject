@@ -5,7 +5,7 @@ module cmd_cfg_tb();
     **/
 
     //Shared by all.
-    logic clk, rst_n
+    logic clk, rst_n;
 
     //Between RemoteComm and UART_comm.
     logic [15:0] data;
