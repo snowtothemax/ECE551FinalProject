@@ -19,6 +19,7 @@ module SPI_mnrch(clk, rst_n, SS_n, SCLK, MOSI, MISO, wrt, wt_data, done, rd_data
    logic init; // High when initializing
    logic done16; // High when done shifting
    logic set_done; // High when we have finished and just have to say where are done
+   logic ld_SCLK;	// assigned in state machine to load the sclk
    
    // 4-bit counter that controls SCLK //
    logic [3:0] SCLK_div;
@@ -48,7 +49,7 @@ module SPI_mnrch(clk, rst_n, SS_n, SCLK, MOSI, MISO, wrt, wt_data, done, rd_data
    * Production of SCLK *
    *********************/
    always_ff @(posedge clk) begin
-      if (init | (state === INIT)) // SCLK_div gets set when the state is INIT here because that keeps the SCLK high when we are not transmitting data
+      if (ld_SCLK) // SCLK_div gets set when the state is INIT here because that keeps the SCLK high when we are not transmitting data
 	     SCLK_div <= 4'b1011;
 	  else
 	     SCLK_div <= SCLK_div + 1;
@@ -100,12 +101,14 @@ module SPI_mnrch(clk, rst_n, SS_n, SCLK, MOSI, MISO, wrt, wt_data, done, rd_data
 	  nxt_state = state;
 	  init = 1'b0;
 	  set_done = 1'b0;
+	  ld_SCLK = 1'b0;
       case (state)
 	     INIT:
 		    if (wrt) begin
 			   init = 1'b1;
 			   nxt_state = SHFT;
 			end
+			ld_SCLK = 1'b1;
 		 SHFT: begin
 		    if (done16)
 			   nxt_state = WAIT;
