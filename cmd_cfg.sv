@@ -17,7 +17,8 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	// Declare internal signals //
 	parameter FAST_SIM = 1;
 	logic [((8*FAST_SIM)+(25*!FAST_SIM)) : 0] timer;
-	logic clr_tmr;
+	logic clr_tmr;			// Clears Timer
+	logic tmr_en;			// Enables Timer
 	// local params for command encodings
 	localparam SET_PITCH = 8'h02;
 	localparam SET_ROLL = 8'h03;
@@ -82,7 +83,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 			timer <= 0;
 		else if (clr_tmr)
 			timer <= 0;
-		else
+		else if (tmr_en)
 			timer <= timer + 1'b1;
 	end
 	assign tmr_full = &(timer);
@@ -109,6 +110,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 		strt_cal = 0;
 		resp_ack = 8'hA5;
 		send_resp = 0;
+		tmr_en = 1'b0;
 		nxt_state = state;
 		case(state)
 			// wait for cmd ready in idle
@@ -151,6 +153,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 						inertial_cal = 1;
 						clr_tmr = 1;
 						nxt_state = CAL_WAIT;
+						tmr_en = 1'b1;
 					end
 				endcase
 			end
@@ -163,6 +166,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 				if(cal_done) begin
 					nxt_state = SEND;
 				end
+				tmr_en = 1'b1;
 			end
 			// send the ack
 			default: begin
