@@ -58,6 +58,53 @@ module cmd_cfg_tb();
     /**
         Calling the tasks needed for the testbench.
     **/
+    task chck_outputs_of_cmd_cfg(logic [7:0]cmd2send, logic [15:0]data2send);
+	output result;
+
+        @(negedge clk) begin
+        	cmd = cmd2send;
+		data = data2send;
+		cmd = 1;
+	end
+        @(negedge clk) cmd = 0;
+        @(negedge cmd_rdy) begin
+		case(cmd2send) 
+			SET_PTCH: begin
+                    		if (d_ptch != data) 
+				result = 0;
+			end
+			SET_ROLL: begin
+		   	 	if (d_roll != data)
+				result = 0;
+			end
+			SET_YAW: begin
+		    		if (d_yaw != data) 
+				result = 0;
+			end
+			SET_THRST: begin
+		    		if (thrst != data) 
+				result = 0;
+			end
+
+			SET_CAL: //nothing here?
+
+			SET_EMGL:
+		    	if (d_ptch != 16'b0000) 
+				result = 0;
+		    	else if (d_yaw != 16'h0000)
+				result = 0;
+		   	else if (d_roll != 16'h0000) 
+				result = 0;
+		    	else if (d_thrst != 16'h0000)
+				result = 0;
+		    	//motors off?
+                 	end
+                 	SET_MOFF : begin
+		    	if (motors_off) 
+			 	result = 0;
+		 	end
+		endcase
+    endtask
 
     initial begin
         /**
