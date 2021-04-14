@@ -4,8 +4,9 @@ module SPI_mnrch(clk, rst_n, SS_n, SCLK, MOSI, MISO, wrt, wt_data, done, rd_data
    input clk, rst_n, wrt;	// 50MHz clock, reset, and the line that is high for 1 clk cycle to initiate SPI transaction
    input MISO; 				// Monarch in, Serf out
    input [15:0] wt_data;	// Data/command being sent to inertial sensor
-   output SS_n, SCLK, MOSI;	// Other SPI protocol signals
-   output reg done;				// Asserted when SPI transaction is complete. Stays asserted until next wrt
+   output SCLK, MOSI;		// Other SPI protocol signals
+   output reg SS_n;			// SPI signal
+   output reg done;			// Asserted when SPI transaction is complete. Stays asserted until next wrt
    output [15:0] rd_data;	// Data from the serf. We only use [7:0] for inertial sensor.
    
    // Generate variable //
@@ -93,6 +94,18 @@ module SPI_mnrch(clk, rst_n, SS_n, SCLK, MOSI, MISO, wrt, wt_data, done, rd_data
 	     done <= 1'b1;
    end
    
+   /************
+   * SS_n Flop *
+   ************/
+   always_ff @(posedge clk, negedge rst_n) begin
+		if (~rst_n)
+			SS_n <= 1'b1;
+		else if (init)
+			SS_n <= 1'b0;
+		else if (set_done)
+			SS_n <= 1'b1;
+   end
+   
    /****************
    * State Machine *
    ****************/
@@ -121,7 +134,5 @@ module SPI_mnrch(clk, rst_n, SS_n, SCLK, MOSI, MISO, wrt, wt_data, done, rd_data
 			end
 	  endcase
    end
-   
-   assign SS_n = done;
    
 endmodule
