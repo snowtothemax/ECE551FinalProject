@@ -166,7 +166,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 			end
 			// send the ack
 			default: begin
-				send_resp;
+				send_resp = 1'b1;
 				nxt_state = IDLE;
 			end
 		endcase
@@ -177,7 +177,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	
 	
 	// SM Controller //
-	always_ff begin
+	always_ff @(posedge clk, negedge rst_n) begin
 		if (~rst_n)
 			state <= IDLE;
 		else
