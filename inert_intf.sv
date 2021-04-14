@@ -176,16 +176,36 @@ module inert_intf(clk, rst_n, strt_cal, INT, cal_done, vld, ptch, roll, yaw, SS_
 	end
 	
 	// When the corresponding assertion takes place, store the valid part of inert_data in the appropriate register //
-	assign ptch_rt[7:0]  = (C_PL) ? inert_data[7:0] : ptch_rt[7:0];
-	assign ptch_rt[15:8] = (C_PH) ? inert_data[7:0] : ptch_rt[15:8];
-	assign roll_rt[7:0]  = (C_RL) ? inert_data[7:0] : roll_rt[7:0];
-	assign roll_rt[15:8] = (C_RH) ? inert_data[7:0] : roll_rt[15:8];
-	assign yaw_rt[7:0]   = (C_YL) ? inert_data[7:0] : yaw_rt[7:0];
-	assign yaw_rt[15:8]  = (C_YH) ? inert_data[7:0] : yaw_rt[15:8];
-	assign ax[7:0]  	 = (C_AXL) ? inert_data[7:0] : ax[7:0];
-	assign ax[15:8] 	 = (C_AXH) ? inert_data[7:0] : ax[15:8];
-	assign ay[7:0]  	 = (C_AYL) ? inert_data[7:0] : ay[7:0];
-	assign ay[15:8] 	 = (C_AYH) ? inert_data[7:0] : ay[15:8];
+	always_ff @(posedge clk)
+		if (C_PL)
+			ptch_rt[7:0] <= inert_data[7:0];
+	always_ff @(posedge clk)
+		if (C_PH)
+			ptch_rt[15:8] <= inert_data[7:0];
+	always_ff @(posedge clk)
+		if (C_RL)
+			roll_rt[7:0] <= inert_data[7:0];
+	always_ff @(posedge clk)
+		if (C_RH)
+			roll_rt[15:8] <= inert_data[7:0];
+	always_ff @(posedge clk)
+		if (C_YL)
+			yaw_rt[7:0] <= inert_data[7:0];
+	always_ff @(posedge clk)
+		if (C_YH)
+			yaw_rt[15:8] <= inert_data[7:0];
+	always_ff @(posedge clk)
+		if (C_AXL)
+			ax[7:0] <= inert_data[7:0];
+	always_ff @(posedge clk)
+		if (C_AXH)
+			ax[15:8] <= inert_data[7:0];
+	always_ff @(posedge clk)
+		if (C_AYL)
+			ay[7:0] <= inert_data[7:0];
+	always_ff @(posedge clk)
+		if (C_AYH)
+			ay[15:8] <= inert_data[7:0];
 	
 	// State flop //
 	always_ff @(posedge clk, negedge rst_n) begin

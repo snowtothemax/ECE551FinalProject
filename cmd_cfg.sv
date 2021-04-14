@@ -16,7 +16,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	
 	// Declare internal signals //
 	parameter FAST_SIM = 1;
-	logic [25:0] timer;
+	logic [((8*FAST_SIM)+(25*!FAST_SIM)) : 0] timer;
 	// local params for command encodings
 	localparam SET_PITCH = 8'h02;
 	localparam SET_ROLL = 8'h03;
@@ -78,13 +78,13 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	// Variable Width Timer & timer logic //
 	always_ff @(posedge clk, negedge rst_n) begin						// This works, but it's ugly and probably not how we are meant to do it
 		if (~rst_n)
-			timer <= 26'h0;
+			timer <= 0;
 		else if (clr_tmr)
-			timer <= 26'h0;
+			timer <= 0;
 		else
 			timer <= timer + 1'b1;
 	end
-	assign tmr_full = FAST_SIM ? (&(timer[8:0])) : (&(timer));
+	assign tmr_full = &(timer);
 	
 	// Output flop //
 	always_ff @(posedge clk, negedge rst_n) begin
