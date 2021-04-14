@@ -103,12 +103,13 @@ module SPI_mnrch(clk, rst_n, SS_n, SCLK, MOSI, MISO, wrt, wt_data, done, rd_data
 	  set_done = 1'b0;
 	  ld_SCLK = 1'b0;
       case (state)
-	     INIT:
+	     INIT: begin
 		    if (wrt) begin
 			   init = 1'b1;
 			   nxt_state = SHFT;
 			end
 			ld_SCLK = 1'b1;
+			end
 		 SHFT: begin
 		    if (done16)
 			   nxt_state = WAIT;

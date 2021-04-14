@@ -76,7 +76,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	end
 	
 	// Variable Width Timer & timer logic //
-	always_ff @(posedge clk, negedge rst_n) begin						// This works, but it's ugly and probably not how we are meant to do it
+	always_ff @(posedge clk, negedge rst_n) begin
 		if (~rst_n)
 			timer <= 0;
 		else if (clr_tmr)
