@@ -91,6 +91,9 @@ module cmd_cfg_tb();
 			SET_CAL: //nothing here?
 				if (strt_cal != 1)
 					result = 0;
+				cal_done = 1;
+				@(negedge clk);
+				cal_done = 0;
 			SET_EMGL:
 		    	if (d_ptch != 16'b0000) 
 					result = 0;
@@ -170,7 +173,7 @@ module cmd_cfg_tb();
         end
 
         //SET_CAL Testing.
-        /* $display("Testing SET_CAL");
+        $display("Testing SET_CAL");
         cmd2snd = SET_CAL;
         data2snd = 16'hxxxx;
         chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
@@ -180,7 +183,7 @@ module cmd_cfg_tb();
         end
         else begin
             $display("SET_CAL Test Passed! YAHOO!!");
-        end */
+        end
 
         //SET_EMGL Testing.
         $display("Testing SET_EMGL");
