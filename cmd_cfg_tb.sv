@@ -4,20 +4,20 @@ module cmd_cfg_tb();
         Setting the commands.
     **/
 
-    localparam SET_PTCH = 8'h02
-    localparam SET_ROLL = 8'h03
-    localparam SET_YAW = 8'h04
-    localparam SET_THRST = 8'h05
-    localparam SET_CAL = 8'h06
-    localparam SET_EMGL = 8'h07
-    localparam SET_MOFF = 8'h08
+    localparam SET_PTCH = 8'h02;
+    localparam SET_ROLL = 8'h03;
+    localparam SET_YAW = 8'h04;
+    localparam SET_THRST = 8'h05;
+    localparam SET_CAL = 8'h06;
+    localparam SET_EMGL = 8'h07;
+    localparam SET_MOFF = 8'h08;
 
     /**
         Setting up the variables for input and output of the duts.
     **/
 
     //Shared by all.
-    logic clk, rst_n
+    logic clk, rst_n;
 
     //Between RemoteComm and UART_comm.
     logic [15:0] data;
@@ -58,50 +58,52 @@ module cmd_cfg_tb();
     /**
         Calling the tasks needed for the testbench.
     **/
-    task chck_outputs_of_cmd_cfg(logic [7:0]cmd2send, logic [15:0]data2send);
-	output result;
-
-        @(negedge clk) begin
-        	cmd = cmd2send;
+    task chck_output_of_cmd_cfg;
+		input logic [7:0] cmd2send;
+		input logic [15:0] data2send;
+		output logic result;
+		
+        @(negedge clk);
+        cmd = cmd2send;
 		data = data2send;
-		cmd = 1;
-	end
-        @(negedge clk) cmd = 0;
-        @(negedge cmd_rdy) begin
+		snd_cmd = 1;
+        @(negedge clk);
+		snd_cmd = 0;
+        @(posedge resp_rdy);
+		result = 1;
 		case(cmd2send) 
 			SET_PTCH: begin
-                    		if (d_ptch != data) 
-				result = 0;
+                if (d_ptch != data) 
+					result = 0;
 			end
 			SET_ROLL: begin
 		   	 	if (d_roll != data)
-				result = 0;
+					result = 0;
 			end
 			SET_YAW: begin
-		    		if (d_yaw != data) 
-				result = 0;
+		    	if (d_yaw != data) 
+					result = 0;
 			end
 			SET_THRST: begin
-		    		if (thrst != data) 
-				result = 0;
+		    	if (thrst != data) 
+					result = 0;
 			end
-
 			SET_CAL: //nothing here?
-
+				if (strt_cal != 1)
+					result = 0;
 			SET_EMGL:
 		    	if (d_ptch != 16'b0000) 
-				result = 0;
+					result = 0;
 		    	else if (d_yaw != 16'h0000)
-				result = 0;
-		   	else if (d_roll != 16'h0000) 
-				result = 0;
-		    	else if (d_thrst != 16'h0000)
-				result = 0;
+					result = 0;
+				else if (d_roll != 16'h0000) 
+					result = 0;
+		    	else if (thrst != 16'h0000)
+					result = 0;
 		    	//motors off?
-                 	end
-                 	SET_MOFF : begin
-		    	if (motors_off) 
-			 	result = 0;
+            SET_MOFF : begin
+		    	if (!motors_off) 
+					result = 0;
 		 	end
 		endcase
     endtask
@@ -113,8 +115,12 @@ module cmd_cfg_tb();
 
         //SET_PTCH Testing.
         $display("Testing SET_PTCH");
+		clk = 0;
+		rst_n = 0;
+		@(negedge clk);
+		rst_n = 1;
         cmd2snd = SET_PTCH;
-        data2snd = 16'h001;
+        data2snd = 16'h0001;
         chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
         if (result == 0) begin
             $display("SET_PTCH Test Failed!");
@@ -123,11 +129,11 @@ module cmd_cfg_tb();
         else begin
             $display("SET_PTCH Test Passed! YAHOO!!");
         end
-
+		repeat(2) @(negedge clk);
         //SET_ROLL Testing.
         $display("Testing SET_ROLL");
         cmd2snd = SET_ROLL;
-        data2snd = 16'h001;
+        data2snd = 16'h0002;
         chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
         if (result == 0) begin
             $display("SET_ROLL Test Failed!");
@@ -140,7 +146,7 @@ module cmd_cfg_tb();
         //SET_YAW Testing.
         $display("Testing SET_YAW");
         cmd2snd = SET_YAW;
-        data2snd = 16'h001;
+        data2snd = 16'h0001;
         chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
         if (result == 0) begin
             $display("SET_YAW Test Failed!");
@@ -153,7 +159,7 @@ module cmd_cfg_tb();
         //SET_THRST Testing.
         $display("Testing SET_THRST");
         cmd2snd = SET_THRST;
-        data2snd = 16'h001;
+        data2snd = 16'h0001;
         chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
         if (result == 0) begin
             $display("SET_THRST Test Failed!");
@@ -164,7 +170,7 @@ module cmd_cfg_tb();
         end
 
         //SET_CAL Testing.
-        $display("Testing SET_CAL");
+        /* $display("Testing SET_CAL");
         cmd2snd = SET_CAL;
         data2snd = 16'hxxxx;
         chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
@@ -174,7 +180,7 @@ module cmd_cfg_tb();
         end
         else begin
             $display("SET_CAL Test Passed! YAHOO!!");
-        end
+        end */
 
         //SET_EMGL Testing.
         $display("Testing SET_EMGL");
@@ -190,7 +196,7 @@ module cmd_cfg_tb();
         end
 
         //SET_EMGL Testing.
-        $display("Testing SET_EMGL");
+        $display("Testing SET_MOFF");
         cmd2snd = SET_MOFF;
         data2snd = 16'hxxxx;
         chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
@@ -212,7 +218,7 @@ module cmd_cfg_tb();
     **/
 
     always begin
-        clk = ~clk;
+        #10 clk = ~clk;
     end
 
 endmodule

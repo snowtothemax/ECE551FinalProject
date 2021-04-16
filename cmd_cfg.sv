@@ -5,7 +5,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	input [7:0] cmd;							// The command opcode
 	input [15:0] data;							// Data that comes with the command.
 	input cal_done;								// Indicates when calibration is done
-	output clr_cmd_rdy;							// Asserted to knock down cmd_rdy after we finish the command
+	output reg clr_cmd_rdy;							// Asserted to knock down cmd_rdy after we finish the command
 	output [7:0] resp;							// The response back to the remote. Typically 0xA5
 	output reg send_resp;							// Asserted when a response should be sent
 	output reg signed [15:0] d_ptch, d_roll, d_yaw;	// Desired pitch, roll, and yaw SIGNED numbers
@@ -98,6 +98,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 			motors_off <= 1'b0;
 	end
 	
+	
 	// SM //
 	always_comb begin
 		wptch = 0;
@@ -111,11 +112,13 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 		resp_ack = 8'hA5;
 		send_resp = 0;
 		tmr_en = 1'b0;
+		clr_cmd_rdy = 0;
 		nxt_state = state;
 		case(state)
 			// wait for cmd ready in idle
 			IDLE: begin
 				if (cmd_rdy) begin
+					clr_cmd_rdy = 1;
 					nxt_state = CMD;
 				end
 			end
