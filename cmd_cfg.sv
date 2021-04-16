@@ -10,7 +10,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	output reg send_resp;							// Asserted when a response should be sent
 	output reg signed [15:0] d_ptch, d_roll, d_yaw;	// Desired pitch, roll, and yaw SIGNED numbers
 	output reg [8:0] thrst;							// UNSIGNED thrust level
-	output strt_cal;							// Indicates when inertial_integrator should calibrate. 1 clock pulse after 1.34 seconds motor spinup period
+	output reg strt_cal;							// Indicates when inertial_integrator should calibrate. 1 clock pulse after 1.34 seconds motor spinup period
 	output reg inertial_cal;						// High during calibration (even motor spinup). Keeps motor at cal speed
 	output reg motors_off;							// Shuts off motors
 	
@@ -30,7 +30,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	
 	// Declare internal signals //
 	// signals declared for control from the SM
-	logic wptch, wroll, wyaw, wthrst, mtrs_off, emergency, strt_cal;
+	logic wptch, wroll, wyaw, wthrst, mtrs_off, emergency;
 	logic  [7:0] resp_ack;
 	
 	// Declare SM signals //
@@ -113,6 +113,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 		send_resp = 0;
 		tmr_en = 1'b0;
 		clr_cmd_rdy = 0;
+		inertial_cal = 0;
 		nxt_state = state;
 		case(state)
 			// wait for cmd ready in idle
@@ -165,11 +166,11 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 			CAL_WAIT: begin
 				if(tmr_full) begin
 					strt_cal = 1;
-				end
-				if(cal_done) begin
+				end else if(cal_done) begin
 					nxt_state = SEND;
 				end
 				tmr_en = 1'b1;
+				inertial_cal = 1'b1;
 			end
 			// send the ack
 			default: begin

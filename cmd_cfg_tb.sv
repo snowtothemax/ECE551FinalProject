@@ -88,12 +88,10 @@ module cmd_cfg_tb();
 		    	if (thrst != data) 
 					result = 0;
 			end
-			SET_CAL: //nothing here?
-				if (strt_cal != 1)
+			SET_CAL: begin //nothing here?
+				if (strt_cal == 1)
 					result = 0;
-				cal_done = 1;
-				@(negedge clk);
-				cal_done = 0;
+				end
 			SET_EMGL:
 		    	if (d_ptch != 16'b0000) 
 					result = 0;
@@ -149,7 +147,7 @@ module cmd_cfg_tb();
         //SET_YAW Testing.
         $display("Testing SET_YAW");
         cmd2snd = SET_YAW;
-        data2snd = 16'h0001;
+        data2snd = 16'h0004;
         chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
         if (result == 0) begin
             $display("SET_YAW Test Failed!");
@@ -162,7 +160,7 @@ module cmd_cfg_tb();
         //SET_THRST Testing.
         $display("Testing SET_THRST");
         cmd2snd = SET_THRST;
-        data2snd = 16'h0001;
+        data2snd = 16'h0008;
         chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
         if (result == 0) begin
             $display("SET_THRST Test Failed!");
@@ -177,6 +175,7 @@ module cmd_cfg_tb();
         cmd2snd = SET_CAL;
         data2snd = 16'hxxxx;
         chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
+		@(negedge clk);
         if (result == 0) begin
             $display("SET_CAL Test Failed!");
             $stop;
@@ -184,7 +183,7 @@ module cmd_cfg_tb();
         else begin
             $display("SET_CAL Test Passed! YAHOO!!");
         end
-
+		
         //SET_EMGL Testing.
         $display("Testing SET_EMGL");
         cmd2snd = SET_EMGL;
@@ -216,6 +215,12 @@ module cmd_cfg_tb();
 
     end
 
+	always_ff @(posedge clk)
+		if (strt_cal) begin
+			cal_done <= 1;
+		end else
+			cal_done <= 0;
+	
     /**
         Setting up the clk for the testbench.
     **/
