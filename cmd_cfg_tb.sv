@@ -88,11 +88,11 @@ module cmd_cfg_tb();
 		    	if (thrst != data) 
 					result = 0;
 			end
-			SET_CAL: begin //nothing here?
+			SET_CAL: begin 
 				if (strt_cal == 1)
 					result = 0;
 				end
-			SET_EMGL:
+			SET_EMGL: // Make sure ptch, roll, yaw, thrst are all 0
 		    	if (d_ptch != 16'b0000) 
 					result = 0;
 		    	else if (d_yaw != 16'h0000)
@@ -102,7 +102,7 @@ module cmd_cfg_tb();
 		    	else if (thrst != 16'h0000)
 					result = 0;
 		    	//motors off?
-            SET_MOFF : begin
+            SET_MOFF : begin	// motors_off should be asserted 
 		    	if (!motors_off) 
 					result = 0;
 		 	end
@@ -130,7 +130,7 @@ module cmd_cfg_tb();
         else begin
             $display("SET_PTCH Test Passed! YAHOO!!");
         end
-		repeat(2) @(negedge clk);
+		
         //SET_ROLL Testing.
         $display("Testing SET_ROLL");
         cmd2snd = SET_ROLL;
@@ -214,7 +214,8 @@ module cmd_cfg_tb();
         $stop;
 
     end
-
+	
+	// This flop asserts cal_done arbitrarily since nothing drives it in this tb //
 	always_ff @(posedge clk)
 		if (strt_cal) begin
 			cal_done <= 1;
