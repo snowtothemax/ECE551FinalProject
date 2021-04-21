@@ -1,7 +1,7 @@
 ###################################
 # Read in the verilog files first #
 ###################################
-read_file -format sverilog { ./QuadCopter.sv ./UART_comm.sv ./UART.sv ./UART_tx.sv ./UART_rcv.sv ./cmd_cfg.sv ./inert_intf.sv ./SPI_mnrch.sv ./inertial_integrator.sv ./flght_cntrl.sv ./ESCs.sv ./ESC_interface.sv }
+read_file -format sverilog { ./QuadCopter.sv ./UART_comm.sv ./UART.sv ./UART_tx.sv ./UART_rcv.sv ./cmd_cfg.sv ./inert_intf.sv ./SPI_mnrch.sv ./inertial_integrator.sv ./flght_cntrl.sv ./ESCs.sv ./ESC_interface.sv ./dff.v ./PD_math.sv ./reset_synch.sv }
 link
 							
 ###################################
@@ -57,13 +57,13 @@ compile -map_effort medium
 ########################################
 # Add clock uncertainty and fix timing #
 ########################################
-# set_clock_uncertainty 0.20 clk
-# set_fix_hold clk
+set_clock_uncertainty 0.20 clk
+set_fix_hold clk
 
 #############
 # Recompile #
 #############
-# compile -map_effort medium
+compile -map_effort medium
 
 ################
 # Make Reports #
@@ -80,7 +80,7 @@ report_area > area.rpt
 #############
 # Recompile #
 #############
-#compile -map_effort medium
+compile -map_effort medium
 
 ###########################################
 # Write out resulting synthesized netlist #
