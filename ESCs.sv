@@ -19,13 +19,13 @@ module ESCs(clk, rst_n, frnt_spd, bck_spd, lft_spd, rght_spd, motors_off, frnt,b
 	ESC_interface frnt_ESC(.clk(clk), .rst_n(rst_n), .wrt(wrt), .SPEED(frnt_input),.PWM(frnt));
 	
 	// bck
-	ESC_interface frnt_ESC(.clk(clk), .rst_n(rst_n), .wrt(wrt), .SPEED(bck_input),.PWM(bck));
+	ESC_interface bck_ESC(.clk(clk), .rst_n(rst_n), .wrt(wrt), .SPEED(bck_input),.PWM(bck));
 	
 	// lft
-	ESC_interface frnt_ESC(.clk(clk), .rst_n(rst_n), .wrt(wrt), .SPEED(lft_input),.PWM(lft));
+	ESC_interface lft_ESC(.clk(clk), .rst_n(rst_n), .wrt(wrt), .SPEED(lft_input),.PWM(lft));
 	
 	// rght
-	ESC_interface frnt_ESC(.clk(clk), .rst_n(rst_n), .wrt(wrt), .SPEED(rght_input),.PWM(rght));
+	ESC_interface bck_ESC(.clk(clk), .rst_n(rst_n), .wrt(wrt), .SPEED(rght_input),.PWM(rght));
 	
 	//////////////////////////////////
 	////////// logic /////////////////
