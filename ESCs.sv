@@ -1,4 +1,4 @@
-module ESCs(clk, rst_n, frnt_spd, bck_spd, lft_spd, rght_spd, motors_off, frnt,bck,lft,rght);
+module ESCs(clk, rst_n, frnt_spd, bck_spd, lft_spd, rght_spd, motors_off, frnt,bck,lft,rght, wrt);
 	input clk, rst_n;										// Clock and rst_n
 	input motors_off;										// tells the speeds to go to zero
 	input wrt;												// tells to write to ESCs
@@ -25,7 +25,7 @@ module ESCs(clk, rst_n, frnt_spd, bck_spd, lft_spd, rght_spd, motors_off, frnt,b
 	ESC_interface lft_ESC(.clk(clk), .rst_n(rst_n), .wrt(wrt), .SPEED(lft_input),.PWM(lft));
 	
 	// rght
-	ESC_interface bck_ESC(.clk(clk), .rst_n(rst_n), .wrt(wrt), .SPEED(rght_input),.PWM(rght));
+	ESC_interface rght_ESC(.clk(clk), .rst_n(rst_n), .wrt(wrt), .SPEED(rght_input),.PWM(rght));
 	
 	//////////////////////////////////
 	////////// logic /////////////////
