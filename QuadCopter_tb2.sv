@@ -1,4 +1,4 @@
-module QuadCopter_tb();
+module QuadCopter_tb2();
 			
 //// Interconnects to DUT/support defined as type wire /////
 wire SS_n,SCLK,MOSI,MISO,INT;
@@ -74,6 +74,7 @@ RemoteComm iREMOTE(.clk(clk), .rst_n(RST_n), .RX(TX), .TX(RX),
 		@(negedge clk);
 		RST_n = 1;
 	endtask
+	
 	// TASK: Checks if calibration worked //
 	task check_if_cal();
 		$display("Testing if calibration worked...");
@@ -126,6 +127,7 @@ initial begin
 	cmd2snd = SET_THRST;
 	data2snd = 9'hFF;
 	snd_cmd(cmd2snd, data2snd);
+	
 	while (iQuad.airborne !== 1)
 		@(posedge clk);
 	
