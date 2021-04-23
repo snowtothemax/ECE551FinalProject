@@ -24,6 +24,7 @@ output reg [10:0] rght_spd;						// 11-bit unsigned speed at which to right fron
   logic [12:0] frnt_spd_ext, bck_spd_ext, lft_spd_ext, rght_spd_ext;
   logic [12:0] thrst_ext; 
   logic signed [12:0] ptch_dterm_ext, ptch_pterm_ext, yaw_pterm_ext, yaw_dterm_ext, roll_dterm_ext, roll_pterm_ext;
+  logic [10:0] frnt_spd_pipe, bck_spd_pipe, lft_spd_pipe, rght_spd_pipe;
 
   ///////////////////////////////////////////////////////////////
   // some Parameters to keep things more generic and flexible //
@@ -77,18 +78,61 @@ output reg [10:0] rght_spd;						// 11-bit unsigned speed at which to right fron
   //////////////////////////////////////////////////////////////////////////////////
   // Set the engine speed output to either the CAL_SPEED or desired engine speed //
   ////////////////////////////////////////////////////////////////////////////////
+
+  // Flops for timing
+  // Outputs are assigned in this flop;
+
+  // front
+  always_ff @(posedge clk, negedge rst_n) begin
+    if(~rst_n) begin
+      frnt_spd <= 11'h000;
+    end
+    else begin
+      frnt_spd <= frnt_spd_pipe;
+    end
+  end
+
+  // back
+  always_ff @(posedge clk, negedge rst_n) begin
+    if(~rst_n) begin
+      bck_spd <= 11'h000;
+    end
+    else begin
+      bck_spd <= bck_spd_pipe;
+    end
+  end
+
+  // lft
+  always_ff @(posedge clk, negedge rst_n) begin
+    if(~rst_n) begin
+      lft_spd <= 11'h000;
+    end
+    else begin
+      lft_spd <= lft_spd_pipe;
+    end
+  end
+
+  // rght
+  always_ff @(posedge clk, negedge rst_n) begin
+    if(~rst_n) begin
+      rght_spd <= 11'h000;
+    end
+    else begin
+      rght_spd <= rght_spd_pipe;
+    end
+  end
   
   // Front //
-  assign frnt_spd = inertial_cal ? CAL_SPEED :
+  assign frnt_spd_pipe = inertial_cal ? CAL_SPEED :
 								   frnt_spd_sat;
   // Back //
-  assign bck_spd  = inertial_cal ? CAL_SPEED :
+  assign bck_spd_pipe = inertial_cal ? CAL_SPEED :
 								   bck_spd_sat;
   // Left //
-  assign lft_spd  = inertial_cal ? CAL_SPEED :
+  assign lft_spd_pipe = inertial_cal ? CAL_SPEED :
 								   lft_spd_sat;
   // Right //
-  assign rght_spd = inertial_cal ? CAL_SPEED :
+  assign rght_spd_pipe = inertial_cal ? CAL_SPEED :
 								   rght_spd_sat;
   
 endmodule 
