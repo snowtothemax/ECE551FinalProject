@@ -66,7 +66,7 @@ initial begin
   $display("Testing calibration of the QuadCopter!");
   cmd2snd = SET_CAL;
   data2snd = 16'hxxxx;
-  chck_output_of_cmd_cfg(cmd2snd, data2snd, send_cmd, iDUT.cmd_rdy, iDUT.strt_cal, iDUT.cal_done, result);
+  chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
   if(result != 1) begin
     $display("Set calibration failed! Check signals strt_cal and cal_done!");
     $Stop;
@@ -76,28 +76,12 @@ initial begin
   end
 
   /**
-    Checking ACK.
-  **/
-  $display("Checking ACK!");
-  chck_ACK(cmd2snd, resp_rdy, resp, result);
-  if(result != 1) begin
-    $display("ACK failed!");
-    $Stop;
-  end
-  else begin
-    $display("ACK passed! Yahoo!");
-  end
-  clr_resp_rdy = 1;
-  @(negedge clk);
-  clr_resp_rdy = 0;
-
-  /**
     Testing the thrusters of the QuadCopter.
   **/
   $display("Testing thrusters of the QuadCopter!");
   cmd2snd = SET_THRST;
   data2snd = 16'h00FF;
-  chck_output_of_cmd_cfg(cmd2snd, data2snd, send_cmd, iDUT.cmd_rdy, iDUT.thrst, iQuad.airborne, result);
+  chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
   if(result != 1) begin
     $display("Set thrust failed! Check signals thrst and airborne!");
     $Stop;
@@ -107,28 +91,12 @@ initial begin
   end
 
   /**
-    Checking ACK.
-  **/
-  $display("Checking ACK!");
-  chck_ACK(cmd2snd, resp_rdy, resp, result);
-  if(result != 1) begin
-    $display("ACK failed!");
-    $Stop;
-  end
-  else begin
-    $display("ACK passed! Yahoo!");
-  end
-  clr_resp_rdy = 1;
-  @(negedge clk);
-  clr_resp_rdy = 0;
-
-  /**
     Testing the pitch of the QuadCopter.
   **/
   $display("Testing pitch of the QuadCopter!");
   cmd2snd = SET_PTCH;
   data2snd = 16'h0100;
-  chck_output_of_cmd_cfg(cmd2snd, data2snd, send_cmd, iDUT.cmd_rdy, iDUT.d_ptch, iDUT.ptch, result);
+  chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
   if(result != 1) begin
     $display("Set pitch failed! Check signals d_ptch and ptch!");
     $Stop;
@@ -138,28 +106,12 @@ initial begin
   end
 
   /**
-    Checking ACK.
-  **/
-  $display("Checking ACK!");
-  chck_ACK(cmd2snd, resp_rdy, resp, result);
-  if(result != 1) begin
-    $display("ACK failed!");
-    $Stop;
-  end
-  else begin
-    $display("ACK passed! Yahoo!");
-  end
-  clr_resp_rdy = 1;
-  @(negedge clk);
-  clr_resp_rdy = 0;
-
-  /**
     Testing the roll of the QuadCopter.
   **/
   $display("Testing roll of the QuadCopter!");
   cmd2snd = SET_ROLL;
   data2snd = -16'h0080;
-  chck_output_of_cmd_cfg(cmd2snd, data2snd, send_cmd, iDUT.cmd_rdy, iDUT.d_roll, iDUT.roll, result);
+  chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
   if(result != 1) begin
     $display("Set roll failed! Check signals d_roll and roll!");
     $Stop;
@@ -169,28 +121,12 @@ initial begin
   end
 
   /**
-    Checking ACK.
-  **/
-  $display("Checking ACK!");
-  chck_ACK(cmd2snd, resp_rdy, resp, result);
-  if(result != 1) begin
-    $display("ACK failed!");
-    $Stop;
-  end
-  else begin
-    $display("ACK passed! Yahoo!");
-  end
-  clr_resp_rdy = 1;
-  @(negedge clk);
-  clr_resp_rdy = 0;
-
-  /**
     Testing the yaw of the QuadCopter.
   **/
   $display("Testing yaw of the QuadCopter!");
   cmd2snd = SET_YAW;
   data2snd = 16'h0080;
-  chck_output_of_cmd_cfg(cmd2snd, data2snd, send_cmd, iDUT.cmd_rdy, iDUT.d_yaw, iDUT.yaw, result);
+  chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
   if(result != 1) begin
     $display("Set yaw failed! Check signals d_yaw and yaw!");
     $Stop;
@@ -200,28 +136,12 @@ initial begin
   end
 
   /**
-    Checking ACK.
-  **/
-  $display("Checking ACK!");
-  chck_ACK(cmd2snd, resp_rdy, resp, result);
-  if(result != 1) begin
-    $display("ACK failed!");
-    $Stop;
-  end
-  else begin
-    $display("ACK passed! Yahoo!");
-  end
-  clr_resp_rdy = 1;
-  @(negedge clk);
-  clr_resp_rdy = 0;
-
-  /**
     Testing the emergency landing of the QuadCopter.
   **/
   $display("Testing emergency landing of the QuadCopter!");
   cmd2snd = SET_EMGL;
   data2snd = 16'h0000;
-  chck_output_of_cmd_cfg(cmd2snd, send_cmd, iDUT.cmd_rdy, iDUT.d_yaw, iDUT.d_roll, iDUT.d_ptch, result);
+  chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
   if(result != 1) begin
     $display("Set emergency landing failed! Check signals d_yaw, d_roll and d_ptch!");
     $Stop;
@@ -231,28 +151,12 @@ initial begin
   end
 
   /**
-    Checking ACK.
-  **/
-  $display("Checking ACK!");
-  chck_ACK(cmd2snd, resp_rdy, resp, result);
-  if(result != 1) begin
-    $display("ACK failed!");
-    $Stop;
-  end
-  else begin
-    $display("ACK passed! Yahoo!");
-  end
-  clr_resp_rdy = 1;
-  @(negedge clk);
-  clr_resp_rdy = 0;
-
-  /**
     Testing the motor off of the QuadCopter.
   **/
   $display("Testing motor off of the QuadCopter!");
   cmd2snd = SET_MOFF;
   data2snd = 16'hxxxx;
-  chck_output_of_cmd_cfg(cmd2snd, data2snd, send_cmd, iDUT.cmd_rdy, iDUT.motors_off, 0'hxxxx, result);
+  chck_output_of_cmd_cfg(cmd2snd, data2snd, result);
   if(result != 1) begin
     $display("Set motors off failed! Check signal motors_off!");
     $Stop;
@@ -260,22 +164,6 @@ initial begin
   else begin
     $display("Set motors_off passed! Yahoo!");
   end
-
-  /**
-    Checking ACK.
-  **/
-  $display("Checking ACK!");
-  chck_ACK(cmd2snd, resp_rdy, resp, result);
-  if(result != 1) begin
-    $display("ACK failed!");
-    $Stop;
-  end
-  else begin
-    $display("ACK passed! Yahoo!");
-  end
-  clr_resp_rdy = 1;
-  @(negedge clk);
-  clr_resp_rdy = 0;
   
 end
 
@@ -283,5 +171,7 @@ always
   #10 clk = ~clk;
 
 /// perhaps include a tb_tasks file with helper tasks for testing.
+
+`include "FinalProject_tb_tasks.sv"
 
 endmodule	
