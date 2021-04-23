@@ -14,6 +14,7 @@ set current_design QuadCopter
 #############
 create_clock -name "clk" -period 3.75 -waveform {0 1} {clk}
 set_dont_touch_network [find port clk]
+set_dont_touch_network [get_net iRST/rst_n]
 
 ###################
 # Set input delay #
@@ -25,7 +26,6 @@ set_input_delay -clock clk 0.25 $prim_inputs
 # Set driving strength #
 ########################
 set_driving_cell -lib_cell NAND2X2_RVT -library saed32rvt_tt0p85v25c $prim_inputs
-set_drive 0.1 rst_n
 
 ###############################
 # Set output delay consraints #
@@ -43,7 +43,7 @@ set_max_transition 0.15 [current_design]
 ######################
 # Compile the design #
 ######################
-compile -map_effort medium
+compile -map_effort high
 
 ###########
 # Ungroup #

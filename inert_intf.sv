@@ -25,7 +25,7 @@ module inert_intf(clk, rst_n, strt_cal, INT, cal_done, vld, ptch, roll, yaw, SS_
 							 .ay(ay), .ptch(ptch), .roll(roll), .yaw(yaw));
 	
 	// State Capture Signals //
-	logic C_PH, C_PL, C_RH, C_RL, C_YH, C_YL, C_AXH, C_AXL, C_AYH, C_AYL;	// Capture <signal name> high/low
+	logic C_PH, C_PL, C_RH, C_RL, C_YH, C_YL, C_AXH, C_AXL, C_AYH, C_AYL, C_VLD;	// Capture <signal name> high/low
 	
 	// States //
 	typedef enum reg [3:0] {INIT1, INIT2, INIT3, INIT4, READ, PL, PH, RL, RH, YL, YH, AXL, AXH, AYL, AYH} state_t;
@@ -50,8 +50,7 @@ module inert_intf(clk, rst_n, strt_cal, INT, cal_done, vld, ptch, roll, yaw, SS_
 		nxt_state = state;
 			waiting = 0;
 			wrt = 0;
-			C_PL = 0; C_PH = 0; C_RL = 0; C_RH = 0; C_YL = 0; C_YH = 0; C_AXL = 0; C_AXH = 0; C_AYL = 0; C_AYH = 0;
-			vld = 0;
+			C_PL = 0; C_PH = 0; C_RL = 0; C_RH = 0; C_YL = 0; C_YH = 0; C_AXL = 0; C_AXH = 0; C_AYL = 0; C_AYH = 0; C_VLD = 0;
 		case(state)
 			// Defaults //
 			// cmd wasn't defaulted since it was assigned in each state, including the default. //
@@ -168,7 +167,7 @@ module inert_intf(clk, rst_n, strt_cal, INT, cal_done, vld, ptch, roll, yaw, SS_
 				if (done) begin
 					nxt_state = READ;
 					C_AYH = 1;
-					vld = 1;
+					C_VLD = 1;
 				end
 				cmd = 16'hA2xx; // Reset cmd back to prepare for the next read. This isn't necessarily needed, but without this line cmd would have to be defaulted
 				end
@@ -206,6 +205,11 @@ module inert_intf(clk, rst_n, strt_cal, INT, cal_done, vld, ptch, roll, yaw, SS_
 	always_ff @(posedge clk)
 		if (C_AYH)
 			ay[15:8] <= inert_data[7:0];
+	always_ff @(posedge clk)
+		if (C_VLD)
+			vld <= 1;
+		else
+			vld <= 0;
 	
 	// State flop //
 	always_ff @(posedge clk, negedge rst_n) begin
