@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module QuadCopter(clk,RST_n,SS_n,SCLK,MOSI,MISO,INT,RX,TX,FRNT,BCK,LFT,RGHT);
 
   input clk;			// 50MHz clock

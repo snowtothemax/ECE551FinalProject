@@ -34,7 +34,7 @@ module cmd_cfg(clk, rst_n, cmd_rdy, cmd, data, clr_cmd_rdy, resp, send_resp, d_p
 	logic  [7:0] resp_ack;
 	
 	// Declare SM signals //
-	typedef enum reg [2:0] {IDLE, CMD, CAL_WAIT, SEND} state_t;
+	typedef enum reg [1:0] {IDLE, CMD, CAL_WAIT, SEND} state_t;
 	state_t state, nxt_state;
 	
 	// d_ptch register //

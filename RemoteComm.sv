@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module RemoteComm(clk, rst_n, RX, TX, cmd, data, send_cmd, cmd_sent, resp_rdy, resp, clr_resp_rdy);
 
 	input clk, rst_n;		// clock and active low reset

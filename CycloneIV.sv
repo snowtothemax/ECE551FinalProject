@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module CycloneIV(clk,RST_n,SS_n,SCLK,MISO,MOSI,INT,frnt_ESC,back_ESC,left_ESC,rght_ESC);
   /////////////////////////////////////////////////
   // Model of a overall physics of quadcopter   //

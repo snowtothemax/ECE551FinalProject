@@ -50,10 +50,6 @@ compile -map_effort high
 ###########
 ungroup -all -flatten
 
-#############
-# Recompile #
-#############
-compile -map_effort medium
 ########################################
 # Add clock uncertainty and fix timing #
 ########################################
@@ -63,7 +59,12 @@ set_fix_hold clk
 #############
 # Recompile #
 #############
-compile -map_effort medium
+compile -map_effort high
+
+##################
+# Report Latches #
+##################
+report_register -level_sensitive > latches.rpt
 
 ################
 # Make Reports #
@@ -72,19 +73,9 @@ report_timing -delay max > max_delay.rpt
 report_timing -delay min > min_delay.rpt
 report_area > area.rpt
 
-###########
-# Ungroup #
-###########
-#ungroup -all -flatten
-
-#############
-# Recompile #
-#############
-compile -map_effort medium
-
 ###########################################
 # Write out resulting synthesized netlist #
 ###########################################
-write -format verilog SPI_mnrch -output QuadCopter.vg
+write -format verilog QuadCopter -output QuadCopter.vg
 
-write -format verilog SPI_mnrch -output QuadCopter.sdc
+write -format verilog QuadCopter -output QuadCopter.sdc
