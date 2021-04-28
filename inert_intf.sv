@@ -175,38 +175,60 @@ module inert_intf(clk, rst_n, strt_cal, INT, cal_done, vld, ptch, roll, yaw, SS_
 	end
 	
 	// When the corresponding assertion takes place, store the valid part of inert_data in the appropriate register //
-	always_ff @(posedge clk)
-		if (C_PL)
+	always_ff @(posedge clk, negedge rst_n)
+		if (~rst_n)
+			ptch_rt[7:0] <= 0;
+		else if (C_PL)
 			ptch_rt[7:0] <= inert_data[7:0];
-	always_ff @(posedge clk)
-		if (C_PH)
+	always_ff @(posedge clk, negedge rst_n)
+		if (~rst_n)
+			ptch_rt[15:8] <= 0;
+		else if (C_PH)
 			ptch_rt[15:8] <= inert_data[7:0];
-	always_ff @(posedge clk)
-		if (C_RL)
+	always_ff @(posedge clk, negedge rst_n)
+		if (~rst_n)
+			roll_rt[7:0] <= 0;
+		else if (C_RL)
 			roll_rt[7:0] <= inert_data[7:0];
-	always_ff @(posedge clk)
-		if (C_RH)
+	always_ff @(posedge clk, negedge rst_n)
+		if (~rst_n)
+			roll_rt[15:8] <= 0;
+		else if (C_RH)
 			roll_rt[15:8] <= inert_data[7:0];
-	always_ff @(posedge clk)
-		if (C_YL)
+	always_ff @(posedge clk, negedge rst_n)
+		if (~rst_n)
+			yaw_rt[7:0] <= 0;
+		else if (C_YL)
 			yaw_rt[7:0] <= inert_data[7:0];
-	always_ff @(posedge clk)
-		if (C_YH)
+	always_ff @(posedge clk, negedge rst_n)
+		if (~rst_n)
+			yaw_rt[15:8] <= 0;
+		else if (C_YH)
 			yaw_rt[15:8] <= inert_data[7:0];
-	always_ff @(posedge clk)
-		if (C_AXL)
+	always_ff @(posedge clk, negedge rst_n)
+		if (~rst_n)
+			ax[7:0] <= 0;
+		else if (C_AXL)
 			ax[7:0] <= inert_data[7:0];
-	always_ff @(posedge clk)
-		if (C_AXH)
+	always_ff @(posedge clk, negedge rst_n)
+		if (~rst_n)
+			ax[15:8] <= 0;
+		else if (C_AXH)
 			ax[15:8] <= inert_data[7:0];
-	always_ff @(posedge clk)
-		if (C_AYL)
+	always_ff @(posedge clk, negedge rst_n)
+		if (~rst_n)
+			ay[7:0] <= 0;
+		else if (C_AYL)
 			ay[7:0] <= inert_data[7:0];
-	always_ff @(posedge clk)
-		if (C_AYH)
+	always_ff @(posedge clk, negedge rst_n)
+		if (~rst_n)
+			ay[15:8] <= 0;
+		else if (C_AYH)
 			ay[15:8] <= inert_data[7:0];
-	always_ff @(posedge clk)
-		if (C_VLD)
+	always_ff @(posedge clk, negedge rst_n)
+		if (~rst_n)
+			vld <= 0;
+		else if (C_VLD)
 			vld <= 1;
 		else
 			vld <= 0;
