@@ -1,5 +1,4 @@
 `timescale 1ns/1ps
-`include "QuadCopter_tb4_task.sv"
 module QuadCopter_tb4();
 	
 //// Interconnects to DUT/support defined as type wire /////
@@ -97,23 +96,20 @@ initial begin
 	pitch = 16'h0100;
 	snd_cmd(SET_PTCH, pitch);
 	check_desired(SET_PTCH, pitch);
-	repeat(2000000) @(posedge clk);
 
 	//Set the roll.
 	$display("Setting roll");
 	roll = 16'hFF80;
 	snd_cmd(SET_ROLL, roll);	
 	check_desired(SET_ROLL,roll);
-	repeat(2000000) @(posedge clk);
 
 	//Set the yaw.
 	$display("Setting yaw");
 	yaw = 16'h0080;
 	snd_cmd(SET_YAW, yaw);
 	check_desired(SET_YAW,yaw);
-	repeat(2000000) @(posedge clk);
 
-	//Check the final values of pitch, roll and yaw.
+	//Check the final values of pitch, roll and yaw. - These tasks wait for the pitch, roll, and yaw to drop to near desired value.
 	check_final(SET_PTCH,pitch);
 	check_final(SET_ROLL,roll);
 	check_final(SET_YAW,yaw);
@@ -123,19 +119,59 @@ initial begin
 	snd_cmd(SET_EMGL, 16'h0000);
 	check_desired(SET_EMGL, 16'h0000);
 
-	//Start turning the motors off.
-	//$display("turning motors off");
-	//snd_cmd(SET_MOFF, 16'h0000);
-	//check_desired(SET_MOFF, 16'h0000);
-
 	wait_for_landing();
-	$display("Finished Test");
+	
+	// Recalibrate and reset the pitch, roll, yaw just like above to test motors_off //
+    $display("Testing SET_CAL");
+	cmd2snd = SET_CAL;
+	data2snd = 16'hxxxx;
+	snd_cmd(cmd2snd, data2snd);
+	check_if_cal();
+	
+	
+	//Set the thrust
+	$display("Setting Thrust");
+	thrust = 16'hFF;
+	snd_cmd(SET_THRST, thrust);
+	
+	while (iQuad.airborne !== 1)
+		@(posedge clk);
+		
+	@(posedge iDUT.cmd_rdy);
+	@(posedge resp_rdy);
+	//Set the pitch.
+	$display("Setting pitch");
+	pitch = 16'h0100;
+	snd_cmd(SET_PTCH, pitch);
+	check_desired(SET_PTCH, pitch);
+
+	//Set the roll.
+	$display("Setting roll");
+	roll = 16'hFF80;
+	snd_cmd(SET_ROLL, roll);	
+	check_desired(SET_ROLL,roll);
+
+	//Set the yaw.
+	$display("Setting yaw");
+	yaw = 16'h0080;
+	snd_cmd(SET_YAW, yaw);
+	check_desired(SET_YAW,yaw);
+	
+	//Start turning the motors off.
+	$display("turning motors off");
+	snd_cmd(SET_MOFF, 16'h0000);
+	check_desired(SET_MOFF, 16'h0000);
+	
+	$display("YAHOO!! We Finished 551!");
    	$stop();
 	
 end
 
 always
   #10 clk = ~clk;
+  
+  
+`include "QuadCopter_tb4_task.sv"
 
 endmodule	
 

@@ -1,0 +1,81 @@
+###################################
+# Read in the verilog files first #
+###################################
+read_file -format sverilog { ./QuadCopter.sv ./UART_comm.sv ./UART.sv ./UART_tx.sv ./UART_rcv.sv ./cmd_cfg.sv ./inert_intf.sv ./SPI_mnrch.sv ./inertial_integrator.sv ./flght_cntrl.sv ./ESCs.sv ./ESC_interface.sv ./dff.v ./PD_math.sv ./reset_synch.sv }
+link
+							
+###################################
+# Set current design to top level #
+###################################
+set current_design QuadCopter
+
+#############
+# Add clock #
+#############
+create_clock -name "clk" -period 3.75 -waveform {0 1} {clk}
+set_dont_touch_network [find port clk]
+set_dont_touch_network [get_net iRST/rst_n]
+
+###################
+# Set input delay #
+###################
+set prim_inputs [remove_from_collection [all_inputs] [find port clk]]
+set_input_delay -clock clk 0.25 $prim_inputs
+
+########################
+# Set driving strength #
+########################
+set_driving_cell -lib_cell NAND2X2_RVT -library saed32rvt_tt0p85v25c $prim_inputs
+
+###############################
+# Set output delay consraints #
+###############################
+set_output_delay -clock clk 0.5 [all_outputs]
+set_load 0.1 [all_outputs]
+
+#############################
+# Miscellaneous Constraints #
+#############################
+set_wire_load_model -name 16000 -library saed32rvt_tt0p85v25c
+
+set_max_transition 0.15 [current_design]
+
+######################
+# Compile the design #
+######################
+compile -map_effort high
+
+###########
+# Ungroup #
+###########
+ungroup -all -flatten
+
+########################################
+# Add clock uncertainty and fix timing #
+########################################
+set_clock_uncertainty 0.20 clk
+set_fix_hold clk
+
+#############
+# Recompile #
+#############
+compile -map_effort high
+
+##################
+# Report Latches #
+##################
+report_register -level_sensitive > latches.rpt
+
+################
+# Make Reports #
+################
+report_timing -delay max > max_delay.rpt
+report_timing -delay min > min_delay.rpt
+report_area > area.rpt
+
+###########################################
+# Write out resulting synthesized netlist #
+###########################################
+write -format verilog QuadCopter -output QuadCopter.vg
+
+write -format verilog QuadCopter -output QuadCopter.sdc

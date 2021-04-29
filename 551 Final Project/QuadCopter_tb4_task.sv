@@ -80,44 +80,44 @@ input [15:0]data2check;
 
 		case(cmd2check)
 			SET_PTCH: begin
-				if (iDUT.d_ptch != data2check) begin
+				if (iDUT.d_ptch !== data2check) begin
 					$display("d_ptch does not match input");
 					$display("input: %h, d_ptch: %h", data2check, iDUT.d_ptch);
 					//$stop();
 				end else 
-					$display("d_ptch correct!");
+					$display("YAHOO!! d_ptch correct!");
 			end
 			SET_ROLL: begin
-				if (iDUT.d_roll != data2check) begin
+				if (iDUT.d_roll !== data2check) begin
 					$display("d_roll does not match input");
 					$display("input: %h, d_roll: %h", data2check, iDUT.d_roll);
 					//$stop();
 				end else 
-					$display("d_roll correct!");
+					$display("YAHOO!! d_roll correct!");
 			end
 			SET_YAW: begin
-				if (iDUT.d_yaw != data2check) begin
+				if (iDUT.d_yaw !== data2check) begin
 					$display("d_yaw does not match input");
 					$display("input: %h, d_yaw: %h", data2check, iDUT.d_yaw);
 					//$stop();
 				end else 
-					$display("d_yaw correct!");
+					$display("YAHOO!! d_yaw correct!");
 			end
 			SET_MOFF: begin
-				if ((iQuad.spd_frnt != 16'h0000) || (iQuad.spd_back != 16'h0000) || (iQuad.spd_left != 16'h0000) || (iQuad.spd_rght != 16'h0000)) begin
+				if (iQuad.thrst !== 13'h0000) begin
 					$display("motors are not off when they should be");
-					$display("front: %h, back: %h, left: %h, right: %h", iQuad.spd_frnt, iQuad.spd_back, iQuad.spd_left, iQuad.spd_rght);
+					$display("thrst: %h", iQuad.thrst);
 					//$stop();
 				end else
-					$display("motors stopped successfully");
+					$display("YAHOO!! Motors stopped successfully");
 			end
 			SET_EMGL: begin
-				if ((iDUT.d_ptch != 16'h0000) || (iDUT.d_roll != 16'h0000) || (iDUT.d_yaw != 16'h0000) || (iDUT.thrst != 8'h00)) begin
+				if ((iDUT.d_ptch !== 16'h0000) || (iDUT.d_roll !== 16'h0000) || (iDUT.d_yaw !== 16'h0000) || (iDUT.thrst !== 8'h00)) begin
 					$display("emergency land values are not zero");
 					$display("d_ptch: %h, d_roll: %h, d_yaw %h, thrust: %h", iDUT.d_ptch, iDUT.d_roll, iDUT.d_yaw, iDUT.thrst);
 					//$stop();
 				end else
-					$display("emergency land values are zero");
+					$display("YAHOO!! Emergency land values are zero");
 			end
 		endcase
     end
@@ -130,32 +130,57 @@ task check_final;
 input [7:0]cmd2check;
 input [15:0]data2check;
     begin
-		assign lower_val = data2check - 10;
-		assign upper_val = data2check + 10;
+		assign lower_val = data2check - 7;
+		assign upper_val = data2check + 7;
+		// Timeout after a long time if the ptch roll or yaw never get close to the desired value //
 		case(cmd2check)
 			SET_PTCH: begin
-				if ((iDUT.ptch < lower_val) | (iDUT.ptch > upper_val)) begin
-					$display("final pitch not near input");
-					$display("input: %d, upper limit: %d, lower limit: %d, final: %d", data2check, upper_val, lower_val, iDUT.ptch);
-					//$stop();
-				end else
-					$display("final pitch correct!");
+				fork
+					begin : timeout2
+						repeat(50000000) @(posedge clk);
+						$display("ERROR: ptch check timed out");
+						$stop();
+					end
+					begin
+						$display("Waiting for pitch to be within range...");
+						while (iDUT.ptch < lower_val || iDUT.ptch > upper_val)
+							@(posedge clk);
+						disable timeout2;
+					end
+				join
+				$display("YAHOO!! Final ptch within range");
 			end
 			SET_ROLL: begin
-				if ((iDUT.roll < lower_val) | (iDUT.roll > upper_val)) begin
-					$display("final roll not near input");
-					$display("input: %d, upper limit: %d, lower limit: %d, final: %d", data2check, upper_val, lower_val, iDUT.roll);
-					//$stop();
-				end else
-					$display("final roll correct!");
+				fork
+					begin : timeout3
+						repeat(50000000) @(posedge clk);
+						$display("ERROR: roll check timed out");
+						$stop();
+					end
+					begin
+						$display("Waiting for roll to be within range...");
+						while (iDUT.roll < lower_val || iDUT.roll > upper_val)
+							@(posedge clk);
+						disable timeout3;
+					end
+				join
+				$display("YAHOO!! Final roll within range");
 			end
 			SET_YAW: begin
-				if ((iDUT.yaw < lower_val) | (iDUT.yaw > upper_val)) begin
-					$display("final yaw not near input");
-					$display("input: %d, upper limit: %d, lower limit: %d, final: %d", data2check, upper_val, lower_val, iDUT.yaw);
-					//$stop();
-				end else
-					$display("final yaw correct!");
+				fork
+					begin : timeout4
+						repeat(50000000) @(posedge clk);
+						$display("ERROR: yaw check timed out");
+						$stop();
+					end
+					begin
+						$display("Waiting for yaw to be within range...");
+						while (iDUT.yaw < lower_val || iDUT.yaw > upper_val)
+							@(posedge clk);
+						disable timeout4;
+					end
+				join
+				$display("YAHOO!! Final yaw within range");
 			end
 		endcase
     end
@@ -166,13 +191,13 @@ endtask
 **/
 task wait_for_landing();
     begin
-		while (iDUT.ptch != 16'h0000) @(posedge clk);
-		$display("pitch zero");
-		while (iDUT.roll != 16'h0000) @(posedge clk);
-		$display("roll zero");
-		while (iDUT.yaw != 16'h0000) @(posedge clk);
-		$display("yaw zero");
-		while (iQuad.thrst != 13'h000) @(posedge clk);
-		$display("quadcopter successfully landed");
+		while (iDUT.ptch > 16'h0007 || iDUT.ptch < $signed(-7)) @(posedge clk);
+		$display("YAHOO!! pitch zero");
+		while (iDUT.roll > 16'h0007 || iDUT.roll < $signed(-7)) @(posedge clk);
+		$display("YAHOO!! roll zero");
+		while (iDUT.yaw > 16'h0007 || iDUT.yaw < $signed(-7)) @(posedge clk);
+		$display("YAHOO!! yaw zero");
+		while (iDUT.thrst !== 13'h0000) @(posedge clk);
+		$display("YAHOO!! quadcopter successfully landed");
     end
 endtask

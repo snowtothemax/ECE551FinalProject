@@ -98,7 +98,10 @@ initial begin
 	cmd2snd = SET_CAL;
 	data2snd = 16'hxxxx;
 	snd_cmd(cmd2snd, data2snd);
-	
+	if (resp !== 8'hA5) begin
+		$display("ERROR: ACK not received! Received ack was %h", resp);
+		$stop();
+	end
 	
 	// SET THRUST //
 	$display("Setting Thrust");
